@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import pickle
 import pandas as pd
@@ -9,6 +9,10 @@ CORS(app)  # Allows HTML frontend to talk to Flask
 # Load your saved model
 with open('model.pkl', 'rb') as f:
     model = pickle.load(f)
+
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
