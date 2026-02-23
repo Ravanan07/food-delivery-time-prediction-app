@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quill | AI Delivery Predictor</title>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+                background: #1a1a1a;
+                font-family: 'Open Sans', sans-serif;
+                color: white;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .predictor-card {
+                background: #252525;
+                padding: 35px 30px;
+                border-radius: 20px;
+                border: 1px solid #00d2ff;
+                box-shadow: 0 0 25px rgba(0, 210, 255, 0.2);
+                width: 100%;
+                max-width: 480px;
+                text-align: center;
+            }
+
+            .predictor-card h2 {
+                color: #00d2ff;
+                font-size: 1.5rem;
+                text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+                margin-bottom: 5px;
+            }
+
+            .predictor-card p {
+                color: #888;
+                font-size: 0.85rem;
+                margin-bottom: 25px;
+            }
+
+            .input-group {
+                text-align: left;
+                margin-bottom: 14px;
+            }
+
+            .input-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 0.85rem;
+                color: #bbb;
+            }
+
+            .input-group label i {
+                margin-right: 6px;
+                color: #00d2ff;
+            }
+
+            input, select {
+                width: 100%;
+                padding: 11px 14px;
+                background: #1b1b1b;
+                border: 1px solid #444;
+                color: white;
+                border-radius: 8px;
+                outline: none;
+                font-size: 0.95rem;
+                transition: border 0.3s;
+            }
+
+            input:focus, select:focus { border-color: #00d2ff; }
+            select option { background: #1b1b1b; }
+
+            .row { display: flex; gap: 12px; }
+            .row .input-group { flex: 1; }
+
+            .predict-btn {
+                width: 100%;
+                padding: 14px;
+                margin-top: 10px;
+                background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+                border: none;
+                color: white;
+                font-weight: bold;
+                font-size: 1rem;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: 0.3s;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .predict-btn:hover {
+                box-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
+                transform: translateY(-2px);
+            }
+
+            .predict-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            #result-box {
+                margin-top: 25px;
+                padding: 20px;
+                background: rgba(0, 210, 255, 0.08);
+                border: 1px solid rgba(0, 210, 255, 0.3);
+                border-radius: 12px;
+            }
+
+            #result-box p { color: #aaa; font-size: 0.9rem; margin-bottom: 8px; }
+
+            #time-output {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #00d2ff;
+                text-shadow: 0 0 10px rgba(0,210,255,0.4);
+            }
+
+            .hidden { display: none; }
+
+            .error-box {
+                margin-top: 15px;
+                padding: 12px;
+                background: rgba(255, 80, 80, 0.1);
+                border: 1px solid rgba(255, 80, 80, 0.4);
+                border-radius: 8px;
+                color: #ff6b6b;
+                font-size: 0.85rem;
+            }
+        </style>
+    </head>
+    <body>
+        <section class="predictor-card">
+            <h2><i class="fas fa-motorcycle"></i> AI Delivery Predictor</h2>
+            <p>Enter delivery details to predict arrival time</p>
+
+            <form id="predictForm" onsubmit="return false;">
+
+                <div class="row">
+                    <div class="input-group">
+                        <label><i class="fas fa-road"></i> Distance (km)</label>
+                        <input type="number" id="distance" placeholder="e.g. 5.4" step="0.1" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fas fa-clock"></i> Prep Time (min)</label>
+                        <input type="number" id="prep_time" placeholder="e.g. 20" min="0">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-group">
+                        <label><i class="fas fa-traffic-light"></i> Traffic Level</label>
+                        <select id="traffic">
+                            <option value="0">Low</option>
+                            <option value="1" selected>Medium</option>
+                            <option value="2">High</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fas fa-user"></i> Courier Experience (yrs)</label>
+                        <input type="number" id="experience" placeholder="e.g. 2" step="0.5" min="0">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-group">
+                        <label><i class="fas fa-cloud-sun"></i> Weather</label>
+                        <select id="weather">
+                            <option value="Clear">Clear / Sunny</option>
+                            <option value="Foggy">Foggy</option>
+                            <option value="Rainy">Rainy</option>
+                            <option value="Snowy">Snowy</option>
+                            <option value="Windy">Windy</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fas fa-sun"></i> Time of Day</label>
+                        <select id="time_of_day">
+                            <option value="Morning">Morning</option>
+                            <option value="Afternoon">Afternoon</option>
+                            <option value="Evening">Evening</option>
+                            <option value="Night">Night</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label><i class="fas fa-bicycle"></i> Vehicle Type</label>
+                    <select id="vehicle">
+                        <option value="Bike">Bike</option>
+                        <option value="Car">Car</option>
+                        <option value="Scooter">Scooter</option>
+                    </select>
+                </div>
+
+                <button type="button" class="predict-btn" id="predictBtn" onclick="showPrediction()">
+                    <i class="fas fa-bolt"></i> Predict Now
+                </button>
+            </form>
+
+            <div id="result-box" class="hidden">
+                <p><i class="fas fa-clock"></i> Estimated Delivery Time</p>
+                <div id="time-output">-- mins</div>
+            </div>
+
+            <div id="error-box" class="error-box hidden"></div>
+        </section>
+
+        <script>
+            async function showPrediction() {
+                const btn = document.getElementById('predictBtn');
+                const resultBox = document.getElementById('result-box');
+                const errorBox = document.getElementById('error-box');
+                const timeOutput = document.getElementById('time-output');
+
+                // Hide previous results
+                resultBox.classList.add('hidden');
+                errorBox.classList.add('hidden');
+
+                // Get values
+                const distance    = document.getElementById('distance').value;
+                const prep_time   = document.getElementById('prep_time').value;
+                const traffic     = document.getElementById('traffic').value;
+                const experience  = document.getElementById('experience').value;
+                const weather     = document.getElementById('weather').value;
+                const time_of_day = document.getElementById('time_of_day').value;
+                const vehicle     = document.getElementById('vehicle').value;
+
+                // Validate
+                if (!distance || !prep_time || !experience) {
+                    errorBox.innerText = "⚠️ Please fill in Distance, Prep Time, and Experience!";
+                    errorBox.classList.remove('hidden');
+                    return;
+                }
+
+                // Loading state
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Predicting...';
+
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/predict', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            distance:    parseFloat(distance),
+                            prep_time:   parseFloat(prep_time),
+                            traffic:     parseInt(traffic),
+                            experience:  parseFloat(experience),
+                            weather:     weather,
+                            time_of_day: time_of_day,
+                            vehicle:     vehicle
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        timeOutput.innerText = result.delivery_time + " mins";
+                        resultBox.classList.remove('hidden');
+                    } else {
+                        throw new Error(result.error);
+                    }
+
+                } catch (error) {
+                    errorBox.innerText = "❌ Could not connect to Flask server. Make sure you ran: python app.py";
+                    errorBox.classList.remove('hidden');
+                    console.error(error);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-bolt"></i> Predict Now';
+                }
+            }
+        </script>
+    </body>
+</html>
